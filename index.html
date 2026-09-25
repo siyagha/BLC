@@ -1,6 +1,37 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDOLRT8QSP4mAoys-1d-QC_GiCWFbd09gM",
+    authDomain: "blc-app-427f8.firebaseapp.com",
+    databaseURL: "https://blc-app-427f8-default-rtdb.firebaseio.com",
+    projectId: "blc-app-427f8",
+    storageBucket: "blc-app-427f8.firebasestorage.app",
+    messagingSenderId: "23945574366",
+    appId: "1:23945574366:web:24aef033178dd9918d92f7",
+    measurementId: "G-C7VE3QFS9Q"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+
+  window.saveDataToCloud = function(data) {
+    set(ref(database, 'sharedData/'), data);
+  };
+
+  const dataRef = ref(database, 'sharedData/');
+  onValue(dataRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      console.log("تم استلام البيانات المحدثة:", data);
+    }
+  });
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BLC — تسيير الشركة</title>

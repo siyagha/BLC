@@ -18,19 +18,36 @@
 
   const app = initializeApp(firebaseConfig);
   const database = getDatabase(app);
+  const dataRef = ref(database, 'appState/');
 
-  window.saveDataToCloud = function(data) {
-    set(ref(database, 'sharedData/'), data);
+  // دالة إرسال البيانات المحفوظة محلياً إلى السحابة
+  window.syncToCloud = function() {
+    const allData = JSON.stringify(localStorage);
+    set(dataRef, allData);
   };
 
-  const dataRef = ref(database, 'sharedData/');
+  // استقبال البيانات المحدثة تلقائياً من السحابة وتحديث الجهاز
   onValue(dataRef, (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      console.log("تم استلام البيانات المحدثة:", data);
+    const cloudData = snapshot.val();
+    if (cloudData) {
+      const parsedData = JSON.parse(cloudData);
+      let isUpdated = false;
+
+      Object.keys(parsedData).forEach(key => {
+        if (localStorage.getItem(key) !== parsedData[key]) {
+          localStorage.setItem(key, parsedData[key]);
+          isUpdated = true;
+        }
+      });
+
+      // إذا ظهرت بيانات جديدة قادمة من جهاز آخر، يتم تحديث الواجهة فوراً
+      if (isUpdated) {
+        location.reload();
+      }
     }
   });
 </script>
+
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
